@@ -1,0 +1,80 @@
+# =========================
+# Build (Maven)
+# =========================
+target/
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# =========================
+# Logs
+# =========================
+*.log
+logs/
+*.tmp
+
+# =========================
+# Spring Tool Suite (STS)
+# =========================
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings/
+.springBeans
+.sts4-cache/
+
+# =========================
+# IntelliJ IDEA
+# =========================
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+
+# =========================
+# VS Code
+# =========================
+.vscode/
+
+# =========================
+# NetBeans
+# =========================
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# =========================
+# OS files
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# Environment / Secrets (não versionar)
+# =========================
+.env
+.env.*
+*.key
+*.pem
+*.p12
+*.jks
+
+# Se tiveres configs locais/sensíveis, ignora só essas variações:
+src/main/resources/application-local.properties
+src/main/resources/application-local.yml
+src/main/resources/application-prod.properties
+src/main/resources/application-prod.yml
+
+# =========================
+# Generated / Temporary
+# =========================
+*.swp
+*.swo
+
+# =========================
+# GitHub tooling in repo (opcional)
+# =========================
+.github/java-upgrade/**/logs/
