@@ -1,0 +1,64 @@
+{
+  "schemaVersion": "1.0",
+  "submissionUUID": "2e2dd9a0-8d7c-4b1c-8f3d-0f5b0e1f2f4a",
+  "taxRegistrationNumber": "5000000000",
+  "submissionTimeStamp": "2024-01-15T10:15:30",
+  "softwareInfo": {
+    "softwareInfoDetail": {
+      "productId": "OKA-ERP",
+      "productVersion": "1.0.0",
+      "softwareValidationNumber": "SVN-123456"
+    },
+    "jwsSoftwareSignature": "<assinatura-do-software>"
+  },
+  "numberOfEntries": 1,
+  "documents": [
+    {
+      "documentNo": "FT 2024/0001",
+      "documentStatus": "N",
+      "jwsDocumentSignature": "<assinatura-do-documento>",
+      "documentDate": "2024-01-15",
+      "documentType": "FT",
+      "eacCode": "11",
+      "systemEntryDate": "2024-01-15T10:15:30",
+      "customerTaxID": "4000000000",
+      "customerCountry": "AO",
+      "companyName": "Cliente Exemplo, Lda",
+      "lines": [
+        {
+          "lineNumber": 1,
+          "productCode": "PROD-001",
+          "productDescription": "Produto Exemplo",
+          "quantity": 2,
+          "unitOfMeasure": "UN",
+          "unitPrice": 500.0,
+          "unitPriceBase": 500.0,
+          "debitAmount": 1000.0,
+          "creditAmount": 0.0,
+          "settlementAmount": 0.0,
+          "taxes": [
+            {
+              "taxType": "IVA",
+              "taxCountryRegion": "AO",
+              "taxCode": "NOR",
+              "taxPercentage": 14.0,
+              "taxContribution": 140.0
+            }
+          ]
+        }
+      ],
+      "withholdingTaxList": [
+        {
+          "withholdingTaxType": "IRT",
+          "withholdingTaxDescription": "Imposto Retido na Fonte",
+          "withholdingTaxAmount": 0.0
+        }
+      ],
+      "documentTotals": {
+        "taxPayable": 140.0,
+        "netTotal": 1000.0,
+        "grossTotal": 1140.0
+      }
+    }
+  ]
+}
