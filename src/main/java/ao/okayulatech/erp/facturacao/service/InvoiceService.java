@@ -1,6 +1,7 @@
 package ao.okayulatech.erp.facturacao.service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -50,6 +51,7 @@ public class InvoiceService {
 
 	@Transactional
 	public InvoiceResponse createInvoice(InvoiceRequest request) {
+		validateDocumentTypes(request);
 		InvoiceHeader header = new InvoiceHeader();
 		header.setSubmissionUUID(request.getSubmissionUUID());
 		header.setTaxRegistrationNumber(request.getTaxRegistrationNumber());
@@ -58,6 +60,7 @@ public class InvoiceService {
 
 		for (DocumentRequest documentRequest : request.getDocuments()) {
 			Document document = mapDocument(documentRequest);
+			applySignatureIfMissing(document);
 			calculateTotals(document);
 			header.addDocument(document);
 		}
@@ -101,6 +104,7 @@ public class InvoiceService {
 			Document updated = mapDocument(request);
 			updated.setId(existing.getId());
 			updated.setInvoiceHeader(existing.getInvoiceHeader());
+			applySignatureIfMissing(updated);
 			calculateTotals(updated);
 			Document saved = documentRepository.save(updated);
 			return mapDocumentResponse(saved);
@@ -118,7 +122,11 @@ public class InvoiceService {
 	@Transactional
 	public Optional<DocumentResponse> signDocument(UUID id, String signature) {
 		return documentRepository.findById(id).map(document -> {
-			document.setJwsDocumentSignature(signature);
+			if (signature == null || signature.isBlank()) {
+				document.setJwsDocumentSignature(generateMockSignature());
+			} else {
+				document.setJwsDocumentSignature(signature);
+			}
 			return mapDocumentResponse(document);
 		});
 	}
@@ -135,6 +143,7 @@ public class InvoiceService {
 	}
 
 	private Document mapDocument(DocumentRequest request) {
+		validateDocumentRequest(request);
 		Document document = new Document();
 		document.setDocumentNo(request.getDocumentNo());
 		document.setDocumentStatus(request.getDocumentStatus());
@@ -225,8 +234,15 @@ public class InvoiceService {
 				netTotal = netTotal.add(lineAmount);
 			}
 			for (Tax tax : line.getTaxes()) {
-				if (tax.getAmount() != null) {
-					taxTotal = taxTotal.add(tax.getAmount());
+				BigDecimal taxAmount = tax.getAmount();
+				if (taxAmount == null && tax.getPercentage() != null && lineAmount != null) {
+					taxAmount = lineAmount
+						.multiply(tax.getPercentage())
+						.divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+					tax.setAmount(taxAmount);
+				}
+				if (taxAmount != null) {
+					taxTotal = taxTotal.add(taxAmount);
 				}
 			}
 		}
@@ -239,6 +255,36 @@ public class InvoiceService {
 		totals.setTaxPayable(taxTotal);
 		totals.setGrossTotal(netTotal.add(taxTotal));
 		document.setTotals(totals);
+	}
+
+	private void validateDocumentTypes(InvoiceRequest request) {
+		request.getDocuments().forEach(this::validateDocumentRequest);
+	}
+
+	private void validateDocumentRequest(DocumentRequest request) {
+		List<String> supportedTypes = List.of("FT", "FR", "FG", "GF", "FA", "NC", "ND", "RE", "RG");
+		if (!supportedTypes.contains(request.getDocumentType())) {
+			throw new IllegalArgumentException("Tipo de documento inválido: " + request.getDocumentType());
+		}
+		if (List.of("NC", "ND", "RE").contains(request.getDocumentType())) {
+			boolean missingReference = request.getLines().stream()
+				.anyMatch(line -> line.getReferenceInfo() == null
+					|| line.getReferenceInfo().getReference() == null
+					|| line.getReferenceInfo().getReference().isBlank());
+			if (missingReference) {
+				throw new IllegalArgumentException("Referência obrigatória para NC/ND/RE.");
+			}
+		}
+	}
+
+	private void applySignatureIfMissing(Document document) {
+		if (document.getJwsDocumentSignature() == null || document.getJwsDocumentSignature().isBlank()) {
+			document.setJwsDocumentSignature(generateMockSignature());
+		}
+	}
+
+	private String generateMockSignature() {
+		return "mock-jws-" + UUID.randomUUID();
 	}
 
 	private InvoiceResponse mapInvoiceResponse(InvoiceHeader header) {

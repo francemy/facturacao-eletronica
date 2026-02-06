@@ -43,6 +43,8 @@ A API usa autenticação **JWT**. Para obter o token, use o endpoint de login:
 
 As credenciais padrão podem ser alteradas em `application.properties`. O token deve ser enviado em `Authorization: Bearer <token>`.
 
+> **Nota:** Se `jwsDocumentSignature` não for enviado, a API gera uma assinatura mock automaticamente para facilitar testes locais.
+
 ### Coleção Postman
 
 - `postman/facturacao-eletronica.postman_collection.json`
