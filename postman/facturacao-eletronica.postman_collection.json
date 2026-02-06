@@ -1,0 +1,49 @@
+{
+  "info": {
+    "name": "Facturacao Eletronica",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Auth - Login",
+      "request": {
+        "method": "POST",
+        "header": [
+          {"key": "Content-Type", "value": "application/json"}
+        ],
+        "url": {
+          "raw": "http://localhost:8833/api-okafaturacao/api/auth/login",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8833",
+          "path": ["api-okafaturacao", "api", "auth", "login"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"oka-admin\",\n  \"password\": \"oka-erp-2024\"\n}"
+        }
+      }
+    },
+    {
+      "name": "Create Invoice",
+      "request": {
+        "method": "POST",
+        "header": [
+          {"key": "Content-Type", "value": "application/json"},
+          {"key": "Authorization", "value": "Bearer {{jwt}}"}
+        ],
+        "url": {
+          "raw": "http://localhost:8833/api-okafaturacao/api/invoices",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8833",
+          "path": ["api-okafaturacao", "api", "invoices"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"submissionUUID\": \"2e2dd9a0-8d7c-4b1c-8f3d-0f5b0e1f2f4a\",\n  \"taxRegistrationNumber\": \"5000000000\",\n  \"submissionTimestamp\": \"2024-01-15T10:15:30\",\n  \"softwareInfo\": {\n    \"softwareInfoDetail\": {\n      \"productId\": \"OKA-ERP\",\n      \"productVersion\": \"1.0.0\",\n      \"softwareValidationNumber\": \"SVN-123456\"\n    },\n    \"jwsSoftwareSignature\": \"<assinatura-do-software>\"\n  },\n  \"documents\": [\n    {\n      \"documentNo\": \"FT 2024/0001\",\n      \"documentStatus\": \"N\",\n      \"documentType\": \"FT\",\n      \"documentDate\": \"2024-01-15\",\n      \"systemEntryDate\": \"2024-01-15T10:15:30\",\n      \"eacCode\": \"11\",\n      \"customer\": {\n        \"taxId\": \"4000000000\",\n        \"country\": \"AO\",\n        \"companyName\": \"Cliente Exemplo, Lda\"\n      },\n      \"lines\": [\n        {\n          \"lineNumber\": 1,\n          \"productCode\": \"PROD-001\",\n          \"productDescription\": \"Produto Exemplo\",\n          \"quantity\": 2,\n          \"unitOfMeasure\": \"UN\",\n          \"unitPrice\": 500.0,\n          \"taxes\": [\n            {\n              \"taxType\": \"IVA\",\n              \"taxCountryRegion\": \"AO\",\n              \"taxCode\": \"NOR\",\n              \"percentage\": 14.0,\n              \"amount\": 140.0\n            }\n          ]\n        }\n      ],\n      \"withholdingTaxes\": []\n    }\n  ]\n}"
+        }
+      }
+    }
+  ]
+}

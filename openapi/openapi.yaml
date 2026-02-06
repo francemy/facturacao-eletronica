@@ -1,0 +1,139 @@
+openapi: 3.0.3
+info:
+  title: Facturação Eletrónica API
+  version: v1
+servers:
+  - url: http://localhost:8833/api-okafaturacao
+security:
+  - bearerAuth: []
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+paths:
+  /api/auth/login:
+    post:
+      summary: Login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [username, password]
+              properties:
+                username:
+                  type: string
+                password:
+                  type: string
+      responses:
+        "200":
+          description: JWT emitido
+  /api/invoices:
+    post:
+      summary: Submeter novo documento fiscal
+      responses:
+        "201":
+          description: Documento criado
+    get:
+      summary: Listar todos os documentos
+      responses:
+        "200":
+          description: Lista de documentos
+  /api/invoices/{id}:
+    get:
+      summary: Obter documento por ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Documento
+    put:
+      summary: Atualizar documento
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Documento atualizado
+    delete:
+      summary: Anular documento
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Documento anulado
+  /api/invoices/search:
+    get:
+      summary: Pesquisar documentos
+      parameters:
+        - name: documentNo
+          in: query
+          schema:
+            type: string
+        - name: documentType
+          in: query
+          schema:
+            type: string
+        - name: dateFrom
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: dateTo
+          in: query
+          schema:
+            type: string
+            format: date
+      responses:
+        "200":
+          description: Resultados
+  /api/invoices/{id}/sign:
+    post:
+      summary: Assinar digitalmente documento
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Documento assinado
+  /api/invoices/{id}/export/saft:
+    get:
+      summary: Exportar SAF-T
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "501":
+          description: Em desenvolvimento
+  /api/invoices/{id}/pdf:
+    get:
+      summary: Gerar PDF
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "501":
+          description: Em desenvolvimento
