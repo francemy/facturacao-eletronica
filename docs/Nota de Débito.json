@@ -1,0 +1,77 @@
+// Nota de Débito - Exemplo de documento JSON para submissão ao SAF-T (PT) com detalhes de uma nota de débito
+{
+    "schemaVersion": "1.2",
+    "submissionUUID": "a1b2c3d4-e5f6-7890-g1h243434-i238j234k52112S434535",
+    "taxRegistrationNumber": "5001636863",
+    "submissionTimeStamp": "2025-12-01T09:30:00Z",
+
+    "softwareInfo": {
+        "softwareInfoDetail": {
+            "productId": "Meu ERP CERTO",
+            "productVersion": "1.0.1",
+            "softwareValidationNumber": "C_134"
+        },
+        "jwsSoftwareSignature": "eyJ0eXAiOiJKT1NFIiwiYWxnIjoiUlMyNTYifQ..."
+    },
+
+    "numberOfEntries": 1,
+
+    "documents": [
+        {
+            "documentNo": "ND FR6325S2C/201",
+            "documentStatus": "N",
+            "jwsDocumentSignature": "eyJ0eXAiOiJKT1NFIiwiYWxnIjoiUlMyNTYifQ...",
+
+            "documentDate": "2025-12-01",
+            "documentType": "ND",
+            "eacCode": "12345",
+            "systemEntryDate": "2025-12-01T09:15:30Z",
+
+            "customerTaxID": "999999999",
+            "customerCountry": "AO",
+            "companyName": "Cliente Exemplo Lda",
+
+            "lines": [
+                {
+                    "lineNumber": 1,
+                    "productCode": "SERV001",
+                    "productDescription": "Acréscimo – Serviço Exemplo",
+                    "quantity": 1,
+                    "unitOfMeasure": "UN",
+
+                    "unitPrice": 300,
+                    "unitPriceBase": 300,
+
+                    "debitAmount": 0,
+                    "creditAmount": 300,
+
+                    "referenceInfo": {
+                        "reference": "FT FR6325S2C/201",
+                        "reason": "Acréscimo ao valor faturado",
+                        "referenceItemLineNo": "1"
+                    },
+
+                    "taxes": [
+                        {
+                            "taxType": "IVA",
+                            "taxCountryRegion": "AO",
+                            "taxCode": "NOR",
+                            "taxPercentage": 14,
+                            "taxContribution": 42
+                        }
+                    ],
+
+                    "settlementAmount": 0
+                }
+            ],
+
+            "documentTotals": {
+                "taxPayable": 42,
+                "netTotal": 300,
+                "grossTotal": 342
+            },
+
+            "withholdingTaxList": []
+        }
+    ]
+}
