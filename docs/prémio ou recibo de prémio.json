@@ -1,0 +1,69 @@
+{
+    "schemaVersion": "1.2",
+    "submissionUUID": "a1b2c3d4-e5f6-7890-g1h243434-i238j234k52112S434535",
+    "taxRegistrationNumber": "5001636863",
+    "submissionTimeStamp": "2025-12-01T09:30:00Z",
+    "softwareInfo": {
+        "softwareInfoDetail": {
+            "productId": "Meu ERP CERTO",
+            "productVersion": "1.0.1",
+            "softwareValidationNumber": "C_134"
+        },
+        "jwsSoftwareSignature": "eyJ0eXAiOiJKT1NFIiwiYWxnIjoiUlMyNTYifQ..."
+    },
+    "numberOfEntries": 1,
+    "documents": [
+        {
+            "documentNo": "RP FR6325S2C/201",
+            "documentStatus": "N",
+            "jwsDocumentSignature": "eyJ0eXAiOiJKT1NFIiwiYWxnIjoiUlMyNTYifQ...",
+            "documentDate": "2025-12-01",
+            "documentType": "RP",
+            "eacCode": "12345",
+            "systemEntryDate": "2025-12-01T09:15:30Z",
+            "customerTaxID": "999999999",
+            "customerCountry": "AO",
+            "companyName": "Cliente Exemplo Lda",
+            "lines": [
+                {
+                    "lineNumber": 1,
+                    "productCode": "PROD001",
+                    "productDescription": "Acréscimo – Produto Exemplo 1",
+                    "quantity": 1,
+                    "unitOfMeasure": "UN",
+                    "unitPrice": 250,
+                    "unitPriceBase": 250,
+                    "debitAmount": 0,
+                    "creditAmount": 250,
+                    "referenceInfo": {
+                        "reference": "FT FR6325S2C/201",
+                        "reason": "Acréscimo ao valor faturado",
+                        "referenceItemLineNo": "1"
+                    },
+                    "taxes": [
+                        {
+                            "taxType": "IVA",
+                            "taxCountryRegion": "AO",
+                            "taxCode": "NOR",
+                            "taxPercentage": 14,
+                            "taxContribution": 35
+                        }
+                    ],
+                    "settlementAmount": 0
+                }
+            ],
+            "documentTotals": {
+                "taxPayable": 35,
+                "netTotal": 250,
+                "grossTotal": 285
+            },
+            "withholdingTaxList": [
+                {
+                    "withholdingTaxType": "IRT",
+                    "withholdingTaxDescription": "Imposto sobre Rendimento do Trabalho",
+                    "withholdingTaxAmount": 1000
+                }
+            ]
+        }
+    ]
+}
