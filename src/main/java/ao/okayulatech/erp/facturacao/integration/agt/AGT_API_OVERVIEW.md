@@ -690,4 +690,90 @@ Este mecanismo desacopla a submissão do processamento, permitindo altas cargas 
 
 ---
 
+## Gestão de Certificados e Chaves
+A infraestrutura de assinatura digital utiliza criptografia assimétrica (RSA) com chaves privadas mantidas pelos produtores de software e chaves públicas registadas na AGT.
+
+### Como são entregues as chaves aos contribuintes
+
+- As chaves dos contribuintes utilizadas para assinatura de documentos e requisições (`jwsDocumentSignature` e `jwsSignature`) são emitidas pela AGT e disponibilizadas no portal do contribuinte.
+- As chaves para assinatura do software (`jwsSoftwareSignature`) **não** são emitidas pela AGT.
+
+Cada produtor de software deve:
+
+1. Gerar localmente um par de chaves RSA (privada + pública).
+2. Manter a chave privada em ambiente seguro (não partilhar).
+3. Submeter a chave pública no portal do parceiro:
+   - Testes: `https://portaldoparceiro.hml.minfin.gov.ao/`
+   - Produção: `https://portaldoparceiro.minfin.gov.ao/`
+
+### Estrutura da chave (RSA mínimo 2048 bits)
+
+- Tipo: RSA
+- Tamanho: mínimo 2048 bits
+- Formato recomendado: PEM
+- Codificação: Base64 (padrão do PEM)
+
+Exemplo de chave pública válida:
+
+```
+-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAw12…
+…restante conteúdo…
+-----END PUBLIC KEY-----
+```
+
+Exemplo de chave privada (nunca deve ser enviada):
+
+```
+-----BEGIN PRIVATE KEY-----
+MIIEvAIBADANBgkqhkiG9w0BAQEFAASCBK…
+-----END PRIVATE KEY-----
+```
+
+### Procedimento em caso de comprometimento
+
+Se o produtor suspeitar que a chave privada foi exposta:
+
+1. Revogar imediatamente a chave comprometida.
+2. Gerar um novo par de chaves RSA.
+3. Atualizar o software com a nova chave pública no portal do parceiro.
+4. Marcar a chave antiga como revogada.
+
+Impacto sobre documentos:
+
+- Documentos já aceites pela AGT continuam válidos se a assinatura for tecnicamente válida.
+- Novas submissões deixam de ser aceites com a chave revogada.
+
+### Como a API valida a assinatura
+
+1. Receção do documento e extração de `jwsSoftwareSignature`, `jwsDocumentSignature`, `jwsSignature`.
+2. Busca da chave pública ativa (ou correspondente à versão).
+3. Reconstrução do JSON canônico.
+4. Validação do JWS com RS256.
+5. Resultado:
+   - Válido → segue para processamento.
+   - Inválido → retorna erro de assinatura.
+
+---
+
+## Especificações do QR Code nos documentos impressos
+
+| Descrição | Valor |
+| --- | --- |
+| Padrão | QR Code Model 2 |
+| Versão | 4 (33 x 33 módulos) |
+| Nível de correção de erros | M (15%) |
+| Modo de dados | Byte |
+| Codificação de caracteres | UTF-8 |
+| URL codificada | `https://quiosqueagt.minfin.gov.ao/facturacao-eletronica/consultar-fe?emissor=nifEmissor&document=documentNo` |
+| Formato do arquivo | PNG, 350x350 px |
+| Substituição de espaços no `documentNo` | usar `%20` |
+
+Notas:
+
+- Deve ser incluído o logotipo da AGT (quando aplicável), ocupando **menos de 20%** da imagem.
+- O `documentNo` deve ser URL-encoded antes de gerar o QR Code.
+
+---
+
 Este documento é um resumo técnico para referência da equipa de integração. Ajustes finos devem ser feitos conforme a versão oficial do manual da AGT.
