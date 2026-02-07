@@ -306,4 +306,474 @@ Serviço destinado a solicitar a criação de séries de numeração de Faturas 
 
 ---
 
+## Listar Séries
+Serviço destinado a obter a lista de séries de numeração registadas em nome do contribuinte.
+
+### Endereços
+
+- Homologação: `https://sifphml.minfin.gov.ao/sigt/fe/v1/listarSeries`
+- Produção: `https://sifp.minfin.gov.ao/sigt/fe/v1/listarSeries`
+
+### Payload de entrada (exemplo)
+
+```json
+{
+  "schemaVersion": "string",
+  "taxRegistrationNumber": "5001636863",
+  "submissionTimeStamp": "2025-10-28T18:51:10.178Z",
+  "seriesCode": "LD6325S1N",
+  "seriesYear": "2025",
+  "seriesStatus": "A",
+  "documentType": "LD",
+  "establishmentNumber": 10,
+  "jwsSignature": "string",
+  "softwareInfo": {
+    "softwareInfoDetail": {
+      "productId": "Meu ERP CERTO",
+      "productVersion": "1.0.1",
+      "softwareValidationNumber": "C_134"
+    },
+    "jwsSoftwareSignature": "<assinatura>"
+  }
+}
+```
+
+### Payload de assinatura (Listar Série)
+
+```json
+{
+  "taxRegistrationNumber": "..."
+}
+```
+
+### Payload de saída (exemplo)
+
+```json
+{
+  "resultCode": "1",
+  "seriesResultCount": "0",
+  "seriesInfo": []
+}
+```
+
+### Notas importantes
+
+- `seriesStatus`: **A** (aberta), **U** (em utilização), **F** (fechada).
+- `jwsSignature` assina os campos definidos pelo manual (ex.: `taxRegistrationNumber`).
+
+---
+
+## Registar Factura
+Serviço destinado ao registo de facturas electrónicas, devolvendo um `requestID` para consulta posterior.
+
+### Endereços
+
+- Homologação: `https://sifphml.minfin.gov.ao/sigt/fe/v1/registarFactura`
+- Produção: `https://sifp.minfin.gov.ao/sigt/fe/v1/registarFactura`
+
+### Payload de entrada (exemplo)
+
+```json
+{
+  "schemaVersion": "1.2",
+  "submissionUUID": "a1b2c3d4-e5f6-7890-g1h2-i23822j2232-3784",
+  "taxRegistrationNumber": "5001636863",
+  "submissionTimeStamp": "2025-11-04T14:30:00Z",
+  "softwareInfo": {
+    "softwareInfoDetail": {
+      "productId": "Meu ERP CERTO",
+      "productVersion": "1.0.1",
+      "softwareValidationNumber": "C_134"
+    },
+    "jwsSoftwareSignature": "<assinatura>"
+  },
+  "numberOfEntries": 1,
+  "documents": [
+    {
+      "documentNo": "FT FT6325S2C/10006",
+      "documentStatus": "N",
+      "jwsDocumentSignature": "<assinatura>",
+      "documentDate": "2025-11-04",
+      "documentType": "FT",
+      "eacCode": "12345",
+      "systemEntryDate": "2025-11-04T11:15:30Z",
+      "customerTaxID": "PT987654321",
+      "customerCountry": "PT",
+      "companyName": "Cliente Exemplo Lda",
+      "lines": [
+        {
+          "lineNumber": 1,
+          "productCode": "PROD001",
+          "productDescription": "Produto Exemplo 1",
+          "quantity": 2,
+          "unitOfMeasure": "UN",
+          "unitPrice": 250,
+          "unitPriceBase": 250,
+          "debitAmount": 0,
+          "creditAmount": 500,
+          "taxes": [
+            {
+              "taxType": "IVA",
+              "taxCountryRegion": "AO",
+              "taxCode": "NOR",
+              "taxPercentage": 14,
+              "taxContribution": 70
+            }
+          ],
+          "settlementAmount": 0
+        }
+      ],
+      "documentTotals": {
+        "taxPayable": 70,
+        "netTotal": 500,
+        "grossTotal": 570
+      },
+      "withholdingTaxList": [
+        {
+          "withholdingTaxType": "IRT",
+          "withholdingTaxDescription": "Retenção na fonte",
+          "withholdingTaxAmount": 16.5
+        }
+      ]
+    }
+  ]
+}
+```
+
+### Payload de assinatura (Registar Factura)
+
+```json
+{
+  "documentNo": "...",
+  "taxRegistrationNumber": "...",
+  "documentType": "...",
+  "documentDate": "...",
+  "customerTaxID": "...",
+  "customerCountry": "...",
+  "companyName": "...",
+  "documentTotals": {
+    "taxPayable": 70,
+    "netTotal": 500,
+    "grossTotal": 570
+  }
+}
+```
+
+### Payload de saída (exemplo)
+
+```json
+{
+  "requestID": "202500000010689",
+  "errorList": []
+}
+```
+
+### Notas importantes
+
+- `numberOfEntries` deve coincidir com o total de documentos no array `documents`.
+- `jwsDocumentSignature` assina os campos exigidos no manual (documentNo, taxRegistrationNumber, documentType, documentDate, customerTaxID, customerCountry, companyName, documentTotals).
+
+---
+
+## Consultar Estado da Fatura
+Serviço destinado a obter o estado de validação das facturas previamente transmitidas através do serviço `registarFactura`.
+
+### Endereços
+
+- Homologação: `https://sifphml.minfin.gov.ao/sigt/fe/v1/obterEstado`
+- Produção: `https://sifp.minfin.gov.ao/sigt/fe/v1/obterEstado`
+
+### Payload de entrada (exemplo)
+
+```json
+{
+  "schemaVersion": "1.2",
+  "submissionUUID": "a1b2c3d4-e5f6-7890-g1h2-i238j234k5122",
+  "taxRegistrationNumber": "5001636863",
+  "submissionTimeStamp": "2025-09-02T14:30:00Z",
+  "softwareInfo": {
+    "softwareInfoDetail": {
+      "productId": "Meu ERP CERTO",
+      "productVersion": "1.0.1",
+      "softwareValidationNumber": "C_134"
+    },
+    "jwsSoftwareSignature": "<assinatura>"
+  },
+  "requestID": "202500000000118"
+}
+```
+
+### Payload de assinatura (Consultar Estado)
+
+```json
+{
+  "taxRegistrationNumber": "...",
+  "requestID": "..."
+}
+```
+
+### Payload de saída (exemplo)
+
+```json
+{
+  "requestID": "202500000000118",
+  "resultCode": "2",
+  "taxRegistrationNumber": "5001636863",
+  "documentStatusList": [],
+  "requestErrorList": []
+}
+```
+
+### Notas importantes
+
+- `resultCode` indica o estado global (ex.: 0, 1, 2, 7, 8, 9).
+- `documentStatusList` só aparece quando o processamento terminou.
+
+---
+
+## Consultar Factura
+Serviço destinado a obter os dados detalhados de uma factura electrónica emitida em nome do contribuinte.
+
+### Endereços
+
+- Homologação: `https://sifphml.minfin.gov.ao/sigt/fe/v1/consultarFactura`
+- Produção: `https://sifp.minfin.gov.ao/sigt/fe/v1/consultarFactura`
+
+### Payload de entrada (exemplo)
+
+```json
+{
+  "schemaVersion": "1.2",
+  "submissionUUID": "a1b2c3d4-e5f6-7890-g1h2-i238j234k5122",
+  "taxRegistrationNumber": "5001636863",
+  "submissionTimeStamp": "2025-09-02T14:30:00Z",
+  "softwareInfo": {
+    "softwareInfoDetail": {
+      "productId": "Meu ERP CERTO",
+      "productVersion": "1.0.1",
+      "softwareValidationNumber": "C_134"
+    },
+    "jwsSoftwareSignature": "<assinatura>"
+  },
+  "jwsSignature": "string",
+  "invoiceNo": "FT FT6325S2C/1000020"
+}
+```
+
+### Payload de assinatura (Consultar Factura)
+
+```json
+{
+  "taxRegistrationNumber": "...",
+  "documentNo": "..."
+}
+```
+
+### Payload de saída (exemplo)
+
+```json
+{
+  "documentNo": "",
+  "documentStatus": "",
+  "document": "",
+  "documentStatusList": [""],
+  "errorList": [
+    {
+      "idError": "E93",
+      "descriptionError": "Documento desconhecido (FT FT6325S2C/1000020)"
+    }
+  ]
+}
+```
+
+---
+
+## Listar Facturas Electrónicas
+Serviço destinado a obter a lista de facturas registadas em nome do contribuinte durante um determinado período.
+
+### Endereços
+
+- Homologação: `https://sifphml.minfin.gov.ao/sigt/fe/ws/v1/listarFacturas`
+- Produção: `https://sifp.minfin.gov.ao/sigt/fe/v1/listarFacturas`
+
+### Payload de entrada (exemplo)
+
+```json
+{
+  "schemaVersion": "1.0",
+  "submissionGUID": "a1b2c3d4-e5f6-7890-g1h2-i2302832271",
+  "taxRegistrationNumber": "5406024493",
+  "submissionTimeStamp": "2025-09-19T07:41:54.473Z",
+  "softwareInfo": {
+    "softwareInfoDetail": {
+      "productId": "Meu ERP CERTO",
+      "productVersion": "1.0.1",
+      "softwareValidationNumber": "C_134"
+    },
+    "jwsSoftwareSignature": "<assinatura>"
+  },
+  "jwsSignature": "string",
+  "queryStartDate": "2025-09-10",
+  "queryEndDate": "2025-09-20"
+}
+```
+
+### Notas importantes
+
+- `jwsSignature` assina `taxRegistrationNumber`, `queryStartDate`, `queryEndDate`.
+- O retorno inclui `documentResultCount` e `documentResultList`.
+
+---
+
+## Validar Documento
+Serviço destinado a confirmar/rejeitar uma factura emitida em nome do adquirente e definir percentagem de IVA dedutível.
+
+### Endereços
+
+- Homologação: `https://sifphml.minfin.gov.ao/sigt/fe/v1/validarDocumento`
+- Produção: `https://sifp.minfin.gov.ao/sigt/fe/v1/validarDocumento`
+
+### Payload de entrada (exemplo)
+
+```json
+{
+  "schemaVersion": "1.2",
+  "submissionTimeStamp": "2025-10-28T18:51:10.178Z",
+  "taxRegistrationNumber": "5001636863",
+  "softwareInfo": {
+    "softwareInfoDetail": {
+      "productId": "Meu ERP CERTO",
+      "productVersion": "1.0.1",
+      "softwareValidationNumber": "C_134"
+    },
+    "jwsSoftwareSignature": "<assinatura>"
+  },
+  "jwsSignature": "string",
+  "documentNo": "FT FT6325S2C/7",
+  "action": "C",
+  "deductibleVATPercentage": "72.5",
+  "nonDeductibleAmount": "200.00"
+}
+```
+
+### Payload de assinatura (Validar Documento)
+
+```json
+{
+  "taxRegistrationNumber": "...",
+  "documentNo": "FT FT6325S2C/7",
+  "action": "C",
+  "deductibleVATPercentage": "72.5",
+  "nonDeductibleAmount": "200.00"
+}
+```
+
+### Notas importantes
+
+- `action`: **C** (confirmar) ou **R** (rejeitar).
+- Apenas um de `deductibleVATPercentage` ou `nonDeductibleAmount` pode ser informado.
+
+---
+
+## Modelo de Processamento Assíncrono
+A submissão de documentos fiscais segue um modelo assíncrono, garantindo escalabilidade e resiliência.
+
+Fluxo geral:
+
+1. O contribuinte envia o documento usando `Registar Factura Eletrónica`.
+2. A API valida apenas a estrutura JSON.
+3. Se estiver correta, o documento entra na fila de processamento.
+4. A API devolve imediatamente um `requestID`.
+5. O produtor consulta mais tarde o estado via `Consultar Estado da Submissão`.
+
+Este mecanismo desacopla a submissão do processamento, permitindo altas cargas e garantindo que o sistema não bloqueia o contribuinte.
+
+---
+
+## Gestão de Certificados e Chaves
+A infraestrutura de assinatura digital utiliza criptografia assimétrica (RSA) com chaves privadas mantidas pelos produtores de software e chaves públicas registadas na AGT.
+
+### Como são entregues as chaves aos contribuintes
+
+- As chaves dos contribuintes utilizadas para assinatura de documentos e requisições (`jwsDocumentSignature` e `jwsSignature`) são emitidas pela AGT e disponibilizadas no portal do contribuinte.
+- As chaves para assinatura do software (`jwsSoftwareSignature`) **não** são emitidas pela AGT.
+
+Cada produtor de software deve:
+
+1. Gerar localmente um par de chaves RSA (privada + pública).
+2. Manter a chave privada em ambiente seguro (não partilhar).
+3. Submeter a chave pública no portal do parceiro:
+   - Testes: `https://portaldoparceiro.hml.minfin.gov.ao/`
+   - Produção: `https://portaldoparceiro.minfin.gov.ao/`
+
+### Estrutura da chave (RSA mínimo 2048 bits)
+
+- Tipo: RSA
+- Tamanho: mínimo 2048 bits
+- Formato recomendado: PEM
+- Codificação: Base64 (padrão do PEM)
+
+Exemplo de chave pública válida:
+
+```
+-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAw12…
+…restante conteúdo…
+-----END PUBLIC KEY-----
+```
+
+Exemplo de chave privada (nunca deve ser enviada):
+
+```
+-----BEGIN PRIVATE KEY-----
+MIIEvAIBADANBgkqhkiG9w0BAQEFAASCBK…
+-----END PRIVATE KEY-----
+```
+
+### Procedimento em caso de comprometimento
+
+Se o produtor suspeitar que a chave privada foi exposta:
+
+1. Revogar imediatamente a chave comprometida.
+2. Gerar um novo par de chaves RSA.
+3. Atualizar o software com a nova chave pública no portal do parceiro.
+4. Marcar a chave antiga como revogada.
+
+Impacto sobre documentos:
+
+- Documentos já aceites pela AGT continuam válidos se a assinatura for tecnicamente válida.
+- Novas submissões deixam de ser aceites com a chave revogada.
+
+### Como a API valida a assinatura
+
+1. Receção do documento e extração de `jwsSoftwareSignature`, `jwsDocumentSignature`, `jwsSignature`.
+2. Busca da chave pública ativa (ou correspondente à versão).
+3. Reconstrução do JSON canônico.
+4. Validação do JWS com RS256.
+5. Resultado:
+   - Válido → segue para processamento.
+   - Inválido → retorna erro de assinatura.
+
+---
+
+## Especificações do QR Code nos documentos impressos
+
+| Descrição | Valor |
+| --- | --- |
+| Padrão | QR Code Model 2 |
+| Versão | 4 (33 x 33 módulos) |
+| Nível de correção de erros | M (15%) |
+| Modo de dados | Byte |
+| Codificação de caracteres | UTF-8 |
+| URL codificada | `https://quiosqueagt.minfin.gov.ao/facturacao-eletronica/consultar-fe?emissor=nifEmissor&document=documentNo` |
+| Formato do arquivo | PNG, 350x350 px |
+| Substituição de espaços no `documentNo` | usar `%20` |
+
+Notas:
+
+- Deve ser incluído o logotipo da AGT (quando aplicável), ocupando **menos de 20%** da imagem.
+- O `documentNo` deve ser URL-encoded antes de gerar o QR Code.
+-
+---
+
 Este documento é um resumo técnico para referência da equipa de integração. Ajustes finos devem ser feitos conforme a versão oficial do manual da AGT.
