@@ -475,4 +475,219 @@ Serviço destinado ao registo de facturas electrónicas, devolvendo um `requestI
 
 ---
 
+## Consultar Estado da Fatura
+Serviço destinado a obter o estado de validação das facturas previamente transmitidas através do serviço `registarFactura`.
+
+### Endereços
+
+- Homologação: `https://sifphml.minfin.gov.ao/sigt/fe/v1/obterEstado`
+- Produção: `https://sifp.minfin.gov.ao/sigt/fe/v1/obterEstado`
+
+### Payload de entrada (exemplo)
+
+```json
+{
+  "schemaVersion": "1.2",
+  "submissionUUID": "a1b2c3d4-e5f6-7890-g1h2-i238j234k5122",
+  "taxRegistrationNumber": "5001636863",
+  "submissionTimeStamp": "2025-09-02T14:30:00Z",
+  "softwareInfo": {
+    "softwareInfoDetail": {
+      "productId": "Meu ERP CERTO",
+      "productVersion": "1.0.1",
+      "softwareValidationNumber": "C_134"
+    },
+    "jwsSoftwareSignature": "<assinatura>"
+  },
+  "requestID": "202500000000118"
+}
+```
+
+### Payload de assinatura (Consultar Estado)
+
+```json
+{
+  "taxRegistrationNumber": "...",
+  "requestID": "..."
+}
+```
+
+### Payload de saída (exemplo)
+
+```json
+{
+  "requestID": "202500000000118",
+  "resultCode": "2",
+  "taxRegistrationNumber": "5001636863",
+  "documentStatusList": [],
+  "requestErrorList": []
+}
+```
+
+### Notas importantes
+
+- `resultCode` indica o estado global (ex.: 0, 1, 2, 7, 8, 9).
+- `documentStatusList` só aparece quando o processamento terminou.
+
+---
+
+## Consultar Factura
+Serviço destinado a obter os dados detalhados de uma factura electrónica emitida em nome do contribuinte.
+
+### Endereços
+
+- Homologação: `https://sifphml.minfin.gov.ao/sigt/fe/v1/consultarFactura`
+- Produção: `https://sifp.minfin.gov.ao/sigt/fe/v1/consultarFactura`
+
+### Payload de entrada (exemplo)
+
+```json
+{
+  "schemaVersion": "1.2",
+  "submissionUUID": "a1b2c3d4-e5f6-7890-g1h2-i238j234k5122",
+  "taxRegistrationNumber": "5001636863",
+  "submissionTimeStamp": "2025-09-02T14:30:00Z",
+  "softwareInfo": {
+    "softwareInfoDetail": {
+      "productId": "Meu ERP CERTO",
+      "productVersion": "1.0.1",
+      "softwareValidationNumber": "C_134"
+    },
+    "jwsSoftwareSignature": "<assinatura>"
+  },
+  "jwsSignature": "string",
+  "invoiceNo": "FT FT6325S2C/1000020"
+}
+```
+
+### Payload de assinatura (Consultar Factura)
+
+```json
+{
+  "taxRegistrationNumber": "...",
+  "documentNo": "..."
+}
+```
+
+### Payload de saída (exemplo)
+
+```json
+{
+  "documentNo": "",
+  "documentStatus": "",
+  "document": "",
+  "documentStatusList": [""],
+  "errorList": [
+    {
+      "idError": "E93",
+      "descriptionError": "Documento desconhecido (FT FT6325S2C/1000020)"
+    }
+  ]
+}
+```
+
+---
+
+## Listar Facturas Electrónicas
+Serviço destinado a obter a lista de facturas registadas em nome do contribuinte durante um determinado período.
+
+### Endereços
+
+- Homologação: `https://sifphml.minfin.gov.ao/sigt/fe/ws/v1/listarFacturas`
+- Produção: `https://sifp.minfin.gov.ao/sigt/fe/v1/listarFacturas`
+
+### Payload de entrada (exemplo)
+
+```json
+{
+  "schemaVersion": "1.0",
+  "submissionGUID": "a1b2c3d4-e5f6-7890-g1h2-i2302832271",
+  "taxRegistrationNumber": "5406024493",
+  "submissionTimeStamp": "2025-09-19T07:41:54.473Z",
+  "softwareInfo": {
+    "softwareInfoDetail": {
+      "productId": "Meu ERP CERTO",
+      "productVersion": "1.0.1",
+      "softwareValidationNumber": "C_134"
+    },
+    "jwsSoftwareSignature": "<assinatura>"
+  },
+  "jwsSignature": "string",
+  "queryStartDate": "2025-09-10",
+  "queryEndDate": "2025-09-20"
+}
+```
+
+### Notas importantes
+
+- `jwsSignature` assina `taxRegistrationNumber`, `queryStartDate`, `queryEndDate`.
+- O retorno inclui `documentResultCount` e `documentResultList`.
+
+---
+
+## Validar Documento
+Serviço destinado a confirmar/rejeitar uma factura emitida em nome do adquirente e definir percentagem de IVA dedutível.
+
+### Endereços
+
+- Homologação: `https://sifphml.minfin.gov.ao/sigt/fe/v1/validarDocumento`
+- Produção: `https://sifp.minfin.gov.ao/sigt/fe/v1/validarDocumento`
+
+### Payload de entrada (exemplo)
+
+```json
+{
+  "schemaVersion": "1.2",
+  "submissionTimeStamp": "2025-10-28T18:51:10.178Z",
+  "taxRegistrationNumber": "5001636863",
+  "softwareInfo": {
+    "softwareInfoDetail": {
+      "productId": "Meu ERP CERTO",
+      "productVersion": "1.0.1",
+      "softwareValidationNumber": "C_134"
+    },
+    "jwsSoftwareSignature": "<assinatura>"
+  },
+  "jwsSignature": "string",
+  "documentNo": "FT FT6325S2C/7",
+  "action": "C",
+  "deductibleVATPercentage": "72.5",
+  "nonDeductibleAmount": "200.00"
+}
+```
+
+### Payload de assinatura (Validar Documento)
+
+```json
+{
+  "taxRegistrationNumber": "...",
+  "documentNo": "FT FT6325S2C/7",
+  "action": "C",
+  "deductibleVATPercentage": "72.5",
+  "nonDeductibleAmount": "200.00"
+}
+```
+
+### Notas importantes
+
+- `action`: **C** (confirmar) ou **R** (rejeitar).
+- Apenas um de `deductibleVATPercentage` ou `nonDeductibleAmount` pode ser informado.
+
+---
+
+## Modelo de Processamento Assíncrono
+A submissão de documentos fiscais segue um modelo assíncrono, garantindo escalabilidade e resiliência.
+
+Fluxo geral:
+
+1. O contribuinte envia o documento usando `Registar Factura Eletrónica`.
+2. A API valida apenas a estrutura JSON.
+3. Se estiver correta, o documento entra na fila de processamento.
+4. A API devolve imediatamente um `requestID`.
+5. O produtor consulta mais tarde o estado via `Consultar Estado da Submissão`.
+
+Este mecanismo desacopla a submissão do processamento, permitindo altas cargas e garantindo que o sistema não bloqueia o contribuinte.
+
+---
+
 Este documento é um resumo técnico para referência da equipa de integração. Ajustes finos devem ser feitos conforme a versão oficial do manual da AGT.
