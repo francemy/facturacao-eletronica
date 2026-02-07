@@ -773,7 +773,7 @@ Notas:
 
 - Deve ser incluído o logotipo da AGT (quando aplicável), ocupando **menos de 20%** da imagem.
 - O `documentNo` deve ser URL-encoded antes de gerar o QR Code.
-
+-
 ---
 
 Este documento é um resumo técnico para referência da equipa de integração. Ajustes finos devem ser feitos conforme a versão oficial do manual da AGT.
