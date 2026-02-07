@@ -76,7 +76,7 @@ public class AgtMapper {
 
 	private AgtDocumentLine mapLine(DocumentLine line) {
 		AgtDocumentLine agtLine = new AgtDocumentLine();
-		agtLine.setLineNumber(line.getLineNumber());
+		agtLine.setLineNumber(String.valueOf(line.getLineNumber()));
 		agtLine.setProductCode(line.getProductCode());
 		agtLine.setProductDescription(line.getProductDescription());
 		agtLine.setQuantity(line.getQuantity());
@@ -97,7 +97,7 @@ public class AgtMapper {
 		AgtReferenceInfo info = new AgtReferenceInfo();
 		info.setReference(referenceInfo.getReference());
 		info.setReason(referenceInfo.getReason());
-		info.setReferenceItemLineNo(referenceInfo.getReferenceItemLineNo());
+		info.setReferenceItemLineNo(String.valueOf(referenceInfo.getReferenceItemLineNo()));
 		return info;
 	}
 

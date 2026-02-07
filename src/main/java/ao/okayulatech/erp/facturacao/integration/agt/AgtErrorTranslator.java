@@ -17,6 +17,6 @@ public class AgtErrorTranslator {
 	}
 
 	public RuntimeException translate(RestClientResponseException ex) {
-		return new IllegalStateException("Erro AGT [" + ex.getRawStatusCode() + "]: " + ex.getResponseBodyAsString(), ex);
+		return new IllegalStateException("Erro AGT [" + ex.getStatusCode().value() + "]: " + ex.getResponseBodyAsString(), ex);
 	}
 }

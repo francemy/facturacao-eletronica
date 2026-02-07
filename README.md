@@ -65,6 +65,17 @@ Depois inicie a aplicação com o perfil `docker`:
 
 Scripts SQL disponíveis em `scripts/sql/init.sql`.
 
+
+</> 
+
+    mvn -U clean package
+
+    rodar sem o docker mvn spring-boot:run -Dspring-boot.run.profiles=dev
+
+    ou
+
+    mvn spring-boot:run -Dspring-boot.run.profiles=test
+
 ### Emissão de Factura (Factura Global)
 
 **POST** `/fatura-geral/v1/registar`
@@ -104,8 +115,8 @@ POST   /api/invoices/advance
 
 ## Exemplos
 
-| Nome | Ficheiro | Observações |
-| --- | --- | --- |
+| Nome           | Ficheiro                        | Observações                                   |
+| -------------- | ------------------------------- | ----------------------------------------------- |
 | Factura Global | `examples/fatura-global.json` | Exemplo único para emissão de factura global. |
 
 > **Nota:** Se forem necessários múltiplos exemplos, use sufixos numéricos e documente todos no quadro acima (ex.: `fatura-global-1.json`, `fatura-global-2.json`).
