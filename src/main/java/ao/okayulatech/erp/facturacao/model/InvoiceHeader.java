@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import ao.okayulatech.erp.facturacao.model.submission.Submission;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -33,6 +34,9 @@ public class InvoiceHeader {
 
 	@OneToOne(mappedBy = "invoiceHeader", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
 	private SoftwareInfo softwareInfo;
+
+	@OneToOne(mappedBy = "invoiceHeader", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+	private Submission submission;
 
 	@OneToMany(mappedBy = "invoiceHeader", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Document> documents = new ArrayList<>();
