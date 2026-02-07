@@ -46,7 +46,7 @@ class DomainValidationServiceTest {
 		request.setCustomer(customer);
 
 		DocumentLineDTO line = new DocumentLineDTO();
-		line.setLineNumber("1");
+		line.setLineNumber(1);
 		line.setProductCode("PRD");
 		line.setProductDescription("Produto");
 		line.setQuantity(BigDecimal.ONE);
