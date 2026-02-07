@@ -34,24 +34,37 @@ import ao.okayulatech.erp.facturacao.model.Tax;
 import ao.okayulatech.erp.facturacao.model.WithholdingTax;
 import ao.okayulatech.erp.facturacao.repository.DocumentRepository;
 import ao.okayulatech.erp.facturacao.repository.InvoiceHeaderRepository;
+import ao.okayulatech.erp.facturacao.service.crypto.SignatureService;
+import ao.okayulatech.erp.facturacao.service.submission.SubmissionWorkflowService;
+import ao.okayulatech.erp.facturacao.service.validation.DomainValidationService;
 
 @Service
 public class InvoiceService {
 
 	private final InvoiceHeaderRepository invoiceHeaderRepository;
 	private final DocumentRepository documentRepository;
+	private final DomainValidationService domainValidationService;
+	private final SignatureService signatureService;
+	private final SubmissionWorkflowService submissionWorkflowService;
 
 	public InvoiceService(
 		InvoiceHeaderRepository invoiceHeaderRepository,
-		DocumentRepository documentRepository
+		DocumentRepository documentRepository,
+		DomainValidationService domainValidationService,
+		SignatureService signatureService,
+		SubmissionWorkflowService submissionWorkflowService
 	) {
 		this.invoiceHeaderRepository = invoiceHeaderRepository;
 		this.documentRepository = documentRepository;
+		this.domainValidationService = domainValidationService;
+		this.signatureService = signatureService;
+		this.submissionWorkflowService = submissionWorkflowService;
 	}
 
 	@Transactional
 	public InvoiceResponse createInvoice(InvoiceRequest request) {
 		validateDocumentTypes(request);
+		domainValidationService.validateInvoiceRequest(request);
 		InvoiceHeader header = new InvoiceHeader();
 		header.setSubmissionUUID(request.getSubmissionUUID());
 		header.setTaxRegistrationNumber(request.getTaxRegistrationNumber());
@@ -66,6 +79,7 @@ public class InvoiceService {
 		}
 
 		InvoiceHeader saved = invoiceHeaderRepository.save(header);
+		submissionWorkflowService.registerSubmission(saved);
 		return mapInvoiceResponse(saved);
 	}
 
@@ -101,6 +115,7 @@ public class InvoiceService {
 	@Transactional
 	public Optional<DocumentResponse> updateDocument(UUID id, DocumentRequest request) {
 		return documentRepository.findById(id).map(existing -> {
+			domainValidationService.validateDocumentTotals(request);
 			Document updated = mapDocument(request);
 			updated.setId(existing.getId());
 			updated.setInvoiceHeader(existing.getInvoiceHeader());
@@ -123,7 +138,7 @@ public class InvoiceService {
 	public Optional<DocumentResponse> signDocument(UUID id, String signature) {
 		return documentRepository.findById(id).map(document -> {
 			if (signature == null || signature.isBlank()) {
-				document.setJwsDocumentSignature(generateMockSignature());
+				document.setJwsDocumentSignature(signatureService.signDocument(document));
 			} else {
 				document.setJwsDocumentSignature(signature);
 			}
@@ -133,12 +148,17 @@ public class InvoiceService {
 
 	private SoftwareInfo mapSoftwareInfo(SoftwareInfoDTO dto) {
 		SoftwareInfo info = new SoftwareInfo();
-		SoftwareInfoDetail detail = new SoftwareInfoDetail();
-		detail.setProductId(dto.getSoftwareInfoDetail().getProductId());
-		detail.setProductVersion(dto.getSoftwareInfoDetail().getProductVersion());
-		detail.setSoftwareValidationNumber(dto.getSoftwareInfoDetail().getSoftwareValidationNumber());
-		info.setSoftwareInfoDetail(detail);
+		if (dto.getSoftwareInfoDetail() != null) {
+			SoftwareInfoDetail detail = new SoftwareInfoDetail();
+			detail.setProductId(dto.getSoftwareInfoDetail().getProductId());
+			detail.setProductVersion(dto.getSoftwareInfoDetail().getProductVersion());
+			detail.setSoftwareValidationNumber(dto.getSoftwareInfoDetail().getSoftwareValidationNumber());
+			info.setSoftwareInfoDetail(detail);
+		}
 		info.setJwsSoftwareSignature(dto.getJwsSoftwareSignature());
+		if (info.getJwsSoftwareSignature() == null || info.getJwsSoftwareSignature().isBlank()) {
+			info.setJwsSoftwareSignature(signatureService.signSoftware(info));
+		}
 		return info;
 	}
 
@@ -279,12 +299,8 @@ public class InvoiceService {
 
 	private void applySignatureIfMissing(Document document) {
 		if (document.getJwsDocumentSignature() == null || document.getJwsDocumentSignature().isBlank()) {
-			document.setJwsDocumentSignature(generateMockSignature());
+			document.setJwsDocumentSignature(signatureService.signDocument(document));
 		}
-	}
-
-	private String generateMockSignature() {
-		return "mock-jws-" + UUID.randomUUID();
 	}
 
 	private InvoiceResponse mapInvoiceResponse(InvoiceHeader header) {
@@ -302,13 +318,15 @@ public class InvoiceService {
 		if (info == null) {
 			return null;
 		}
-		SoftwareInfoDetail detail = info.getSoftwareInfoDetail();
 		SoftwareInfoDTO dto = new SoftwareInfoDTO();
-		SoftwareInfoDetailDTO detailDTO = new SoftwareInfoDetailDTO();
-		detailDTO.setProductId(detail.getProductId());
-		detailDTO.setProductVersion(detail.getProductVersion());
-		detailDTO.setSoftwareValidationNumber(detail.getSoftwareValidationNumber());
-		dto.setSoftwareInfoDetail(detailDTO);
+		SoftwareInfoDetail detail = info.getSoftwareInfoDetail();
+		if (detail != null) {
+			SoftwareInfoDetailDTO detailDTO = new SoftwareInfoDetailDTO();
+			detailDTO.setProductId(detail.getProductId());
+			detailDTO.setProductVersion(detail.getProductVersion());
+			detailDTO.setSoftwareValidationNumber(detail.getSoftwareValidationNumber());
+			dto.setSoftwareInfoDetail(detailDTO);
+		}
 		dto.setJwsSoftwareSignature(info.getJwsSoftwareSignature());
 		return dto;
 	}
