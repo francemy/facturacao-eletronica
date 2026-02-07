@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.2",
+  "submissionUUID": "a1b2c3d4-e5f6-7890-g1h243434-i238j234k52112S434535",
+  "taxRegistrationNumber": "5001636863",
+  "submissionTimeStamp": "2025-12-01T09:30:00Z",
+
+  "softwareInfo": {
+    "softwareInfoDetail": {
+      "productId": "Meu ERP CERTO",
+      "productVersion": "1.0.1",
+      "softwareValidationNumber": "C_134"
+    },
+    "jwsSoftwareSignature": "eyJ0eXAiOiJKT1NFIiwiYWxnIjoiUlMyNTYifQ..."
+  },
+
+  "numberOfEntries": 1,
+
+  "documents": [
+    {
+      "documentNo": "LD FR6325S2C/201",
+      "documentStatus": "N",
+      "jwsDocumentSignature": "eyJ0eXAiOiJKT1NFIiwiYWxnIjoiUlMyNTYifQ...",
+      "documentDate": "2025-12-01",
+      "documentType": "LD",
+      "eacCode": "12345",
+      "systemEntryDate": "2025-12-01T09:15:30Z",
+
+      "customerTaxID": "999999999",
+      "customerCountry": "AO",
+      "companyName": "Seguradora Parceira SA",
+
+      "lines": [
+        {
+          "lineNumber": 1,
+          "productCode": "IMPUT001",
+          "productDescription": "Imputação da Co-segurança – Apólice 2025/XPTO",
+          "quantity": 1,
+          "unitOfMeasure": "UN",
+
+          "unitPrice": 100000,
+          "unitPriceBase": 100000,
+
+          "debitAmount": 0,
+          "creditAmount": 100000,
+
+          "referenceInfo": {
+            "reference": "APOLICE 2025/XPTO",
+            "reason": "Rateio de responsabilidade entre co-seguradoras",
+            "referenceItemLineNo": "1"
+          },
+
+          "taxes": [
+            {
+              "taxType": "IVA",
+              "taxCountryRegion": "AO",
+              "taxCode": "NOR",
+              "taxPercentage": 14,
+              "taxContribution": 14000
+            }
+          ],
+
+          "settlementAmount": 0
+        }
+      ],
+
+      "documentTotals": {
+        "taxPayable": 14000,
+        "netTotal": 100000,
+        "grossTotal": 114000
+      },
+
+      "withholdingTaxList": []
+    }
+  ]
+}
